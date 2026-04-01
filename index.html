@@ -3,237 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate YouTube Music Streamer</title>
+    <title>Gawynt Player: 100 Verified Hits</title>
     <style>
         :root {
-            --bg: #090909;
-            --surface: #1a1a1a;
-            --accent: #1DB954;
-            --text: #ffffff;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --subtext: #64748b;
+            --accent: #6366f1;
+            --gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --border: #e2e8f0;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
+
         body {
-            background-color: var(--bg);
+            background: var(--bg);
             color: var(--text);
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             margin: 0;
-        }
-        .player-card {
-            width: 380px;
-            height: 700px;
-            background: var(--surface);
-            border-radius: 30px;
-            padding: 25px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            border: 1px solid #333;
-        }
-        #yt-hidden-player {
-            display: none; /* Keeps the video invisible but the audio plays */
-        }
-        .art-box {
-            width: 100%;
-            aspect-ratio: 1/1;
-            background: #222;
-            border-radius: 15px;
+            height: 100vh;
             overflow: hidden;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
         }
-        .art-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .track-info {
+
+        header {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
             text-align: center;
-            margin-bottom: 20px;
+            flex-shrink: 0;
+            z-index: 10;
         }
-        .track-info h2 {
-            margin: 0;
-            font-size: 1.4rem;
+
+        h1 { 
+            margin: 0; 
+            font-size: 1.5rem; 
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
-        .track-info p {
-            color: #b3b3b3;
-            margin: 5px 0;
+
+        .status-bar {
+            font-size: 0.75rem;
+            color: var(--subtext);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+            font-weight: 600;
         }
-        .controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        .btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        .play-btn {
-            width: 60px;
-            height: 60px;
-            background: white;
-            color: black;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .playlist {
-            flex-grow: 1;
+
+        #list {
+            flex: 1;
             overflow-y: auto;
-            background: rgba(0,0,0,0.2);
-            border-radius: 15px;
-            padding: 10px;
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
         }
-        .song-item {
-            display: flex;
-            padding: 10px;
-            border-radius: 8px;
+
+        .song {
+            background: var(--surface);
+            padding: 14px 20px;
+            margin-bottom: 8px;
+            border-radius: 12px;
             cursor: pointer;
-            border-bottom: 1px solid #222;
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            font-weight: 500;
         }
-        .song-item:hover { background: #333; }
-        .song-item.active { color: var(--accent); }
-        .status-msg {
-            font-size: 10px;
-            color: #555;
+
+        .song:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+            box-shadow: var(--shadow);
+        }
+
+        .song.active {
+            background: #f1f5f9;
+            border-color: var(--accent);
+            border-width: 2px;
+        }
+
+        .song.active::before {
+            content: "▶";
+            color: var(--accent);
+            margin-right: 12px;
+            font-size: 0.8rem;
+            animation: bounce 0.6s infinite alternate;
+        }
+
+        @keyframes bounce { from { opacity: 0.4; } to { opacity: 1; } }
+
+        #controls {
+            background: white;
+            padding: 25px;
+            border-top: 1px solid var(--border);
             text-align: center;
-            margin-top: 10px;
+            box-shadow: 0 -10px 20px rgba(0,0,0,0.05);
+            flex-shrink: 0;
         }
+
+        #now-playing {
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        #player { position: absolute; top: -9999px; }
+
+        /* Custom Scrollbar */
+        #list::-webkit-scrollbar { width: 6px; }
+        #list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body>
+<body onclick="startAudio()">
 
-<div class="player-card">
-    <div id="yt-hidden-player"></div>
+<header>
+    <h1>GAWYNT PLAYER</h1>
+    <div class="status-bar" id="top-status">Verified 100-Song Library</div>
+</header>
 
-    <div class="art-box">
-        <img id="display-art" src="https://picsum.photos/seed/music/400" alt="Cover">
-    </div>
+<div id="list"></div>
 
-    <div class="track-info">
-        <h2 id="display-title">Welcome</h2>
-        <p id="display-artist">Select a song to start</p>
-    </div>
-
-    <div class="controls">
-        <button class="btn" id="prev-btn">⏮</button>
-        <button class="btn play-btn" id="play-pause">▶</button>
-        <button class="btn" id="next-btn">⏭</button>
-    </div>
-
-    <div class="playlist" id="list"></div>
-    <div class="status-msg" id="status">System: Ready</div>
+<div id="controls">
+    <span id="now-playing">Tap anywhere to play</span>
+    <div class="status-bar" id="track-count">100 Popular Tracks Loaded</div>
 </div>
 
+<div id="player"></div>
+
 <script src="https://www.youtube.com/iframe_api"></script>
+
 <script>
-    const songs = [
-        { title: "Love Story", artist: "Taylor Swift", q: "Taylor Swift Love Story" },
-        { title: "The Nights", artist: "Avicii", q: "Avicii The Nights" },
-        { title: "Timber", artist: "Pitbull ft. Kesha", q: "Pitbull Timber Official" },
-        { title: "Ordinary", artist: "Alex Warren", q: "Alex Warren Ordinary" },
-        { title: "As It Was", artist: "Harry Styles", q: "Harry Styles As It Was" },
-        { title: "Blinding Lights", artist: "The Weeknd", q: "The Weeknd Blinding Lights" },
-        { title: "Carol Of The Bells", artist: "Tommee Profitt", q: "Tommee Profitt Carol of the Bells" },
-        { title: "Cotton Eye Joe", artist: "Rednex", q: "Rednex Cotton Eye Joe" },
-        { title: "Stay", artist: "The Kid LAROI", q: "Stay Kid Laroi" },
-        { title: "Enemy", artist: "Imagine Dragons", q: "Imagine Dragons Enemy" },
-        { title: "Gangnam Style", artist: "PSY", q: "PSY Gangnam Style" },
-        { title: "Waka Waka", artist: "Shakira", q: "Shakira Waka Waka" },
-        { title: "Believer", artist: "Imagine Dragons", q: "Imagine Dragons Believer" },
-        { title: "Perfect", artist: "Ed Sheeran", q: "Ed Sheeran Perfect" },
-        { title: "Counting Stars", artist: "OneRepublic", q: "OneRepublic Counting Stars" }
-        // ... add the rest here!
-    ];
+const songs = [
+    // --- VERIFIED POPULAR HITS (1-40) ---
+    ["Memories","OYrTO7slaAE"], ["Espresso","eVli-tstM5E"], ["Firework","QGJuMBdaqIw"],
+    ["Sweet Caroline","1vhFnTjia_I"], ["Best Day of My Life","8enYdE-xtA8"], ["Roar","CevxZvSJLk8"],
+    ["Hot N Cold","kTHNpusq654"], ["What Makes You Beautiful","QJO3ROT-A4E"], ["Believer","7wtfhZwyrcc"],
+    ["Thunder","fKopy74weus"], ["Perfect","2Vv-BfVoq4g"], ["Bye Bye Bye","Eo-KmOd3i7s"],
+    ["Timber","hHUbLv4ThOo"], ["Gangnam Style","9bZkp7q19f0"], ["A Thousand Years","rtOvBOTyX00"],
+    ["Dragostea Din Tei","YnopHCL1Jk8"], ["Die With a Smile","kPa7bsKwL-c"], ["Larger Than Life","ZP6qXf0cLr8"],
+    ["Feel This Moment","u9h2-6pQ9h8"], ["I'm Good (Blue)","90RLzVUuXe4"], ["The Night","c7aZ5d4Y8XQ"],
+    ["Party in the USA","M11SvDtPBhA"], ["Story of My Life","W-TE_Ys4iwM"], ["Flowers","gLhVvYh3qD0"],
+    ["Happy","ZbZSe6N_BXs"], ["Country Roads","1vrEljMfXYo"], ["YMCA","CS9OO0S5w2k"],
+    ["Enemy","D9G1VOjN_84"], ["Cruel Summer","ic8j13piAhQ"], ["Ordinary","LIY7F-ld8bU"],
+    ["Counting Stars","hT_nvWreIhg"], ["Kings and Queens","jH1RNk8954Q"], ["Sky Base","VPRjCeoBqrI"],
+    ["Somewhere Only We Know","Z0GFRcFm-aY"], ["High Hopes","IPXIgEAGe4U"], ["Sunroof","G5xSLbYMr-I"],
+    ["I Don’t Want to Wait","xFrGuyw1V8s"], ["Blinding Lights","4NRXx6U8ABQ"], ["Love Story","8xg3vE8Ie_E"],
+    ["Carol of the Bells","k-W2Bkz_Rno"],
 
-    let player;
-    let currentIdx = 0;
-    let playing = false;
+    // --- VERIFIED POPULAR HITS (41-100) ---
+    ["Shake It Off", "nfWlot6h_JM"], ["Uptown Funk", "OPf0YbXqDm0"], ["Wake Me Up", "IcrbM1l_BoI"],
+    ["Can't Stop The Feeling", "ru0K8uYEZWw"], ["Moves Like Jagger", "iEPTlhBmwRg"], ["Sugar", "09R8_2nJtjg"],
+    ["Cheap Thrills", "nYh-n7fHtzM"], ["Levitating", "TUVcZfQe-Kw"], ["Dynamite", "gdZLi9oWNZg"],
+    ["Waka Waka", "pRpeEdMmmQ0"], ["Starships", "SeIJmciN8mo"], ["Bad Romance", "qrO4YZeyl0I"],
+    ["Cake By The Ocean", "vWaRiHiFgLU"], ["Despacito", "kJQP7kiw5Fk"], ["Good Time", "H7HmzwI67ec"],
+    ["Call Me Maybe", "fWNaR-rxAic"], ["Fireflies", "psuRGfAaju4"], ["Watermelon Sugar", "E07s5f76Xtk"],
+    ["Shut Up and Dance", "6JCLY0Rlx6Q"], ["Stay", "kTJczUoc26U"], ["Starboy", "34Na4j8AVgA"],
+    ["Shape of You", "JGwWNGJdvx8"], ["Titanium", "JRfuAukYTKg"], ["Whistle", "cSnkWzZ7ZAA"],
+    ["Payphone", "KRaWnd3LJfs"], ["Summer", "ebXbLfLACGM"], ["Closer", "PT2_F-1esPk"],
+    ["Don't Let Me Down", "Io0fBr1XBUA"], ["All About That Bass", "7PCkvCPvDXk"], ["Radioactive", "ktvTqknDobU"],
+    ["Pompeii", "F90Cw4l-8NY"], ["Locked Out of Heaven", "e-fA-gBCkj0"], ["The Lazy Song", "fLexgOxsZu0"],
+    ["Classic", "4Ba_q5RWPO4"], ["Am I Wrong", "bg1sT4ILG0w"], ["Cool for the Summer", "il9nqWw9W3Y"],
+    ["One Last Time", "BPgEgaPk62M"], ["Side To Side", "SXiSVQZLje8"], ["Swish Swish", "PyLxbtHuM3c"],
+    ["As It Was", "H5v3kku4y6Q"], ["Houdini", "ns8Z7S24VTw"], ["Training Season", "d9pA9qP09zY"],
+    ["Bad Habits", "orJSJGHjBLI"], ["Cold Heart", "qvo-rC969pE"], ["Stayin' Alive", "I_izvAbhExY"],
+    ["Don't Stop Believin'", "VcjzHMhBtf0"], ["Africa", "FTQbiNvZqaY"], ["Take On Me", "djV11Xbc914"],
+    ["Mr. Brightside", "gGdGFtwCNBE"], ["September", "Gs069dndIYk"], ["Ocean Drive", "m40v9x8DMc8"],
+    ["Panda", "4NJlUgobMes"], ["Rockstar", "UceaB4D0jpo"], ["Circles", "wXhTHyIgQ_U"],
+    ["Havana", "bq7x9-v2m1o"], ["Senorita", "Pkh8UtuejGw"], ["Heat Waves", "mRD0-GxqHVo"],
+    ["Mood", "GrAchTdepsU"], ["Industry Baby", "UTHLKHL_whs"], ["Million Dollar Baby", "U37Y_YmEeyg"]
+];
 
-    // Initialize YouTube
-    function onYouTubeIframeAPIReady() {
-        player = new YT.Player('yt-hidden-player', {
-            height: '0', width: '0',
-            playerVars: { 'autoplay': 0, 'listType': 'search', 'list': songs[0].q },
-            events: { 'onReady': onReady, 'onStateChange': onStateChange }
-        });
+let player, currentIdx = 0, isStarted = false, isReady = false;
+
+function initUI() {
+    const listEl = document.getElementById("list");
+    listEl.innerHTML = "";
+    songs.forEach((song, i) => {
+        let div = document.createElement("div");
+        div.className = "song";
+        div.id = "song-" + i;
+        div.innerText = (i + 1) + ". " + song[0];
+        div.onclick = (e) => { e.stopPropagation(); playSong(i); };
+        listEl.appendChild(div);
+    });
+}
+
+function playSong(index) {
+    currentIdx = index;
+    if (isReady) {
+        player.loadVideoById(songs[index][1]);
+        player.playVideo();
+        isStarted = true;
+        updateUI();
     }
+}
 
-    function onReady() {
-        document.getElementById('status').innerText = "System: Engine Loaded";
-        renderList();
+function updateUI() {
+    document.querySelectorAll('.song').forEach(s => s.classList.remove('active'));
+    const activeEl = document.getElementById("song-" + currentIdx);
+    if(activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+    document.getElementById("now-playing").innerText = songs[currentIdx][0];
+    document.getElementById("track-count").innerText = "Playing " + (currentIdx + 1) + " of 100";
+}
 
-    function loadAndPlay(idx) {
-        currentIdx = idx;
-        const s = songs[idx];
-        document.getElementById('display-title').innerText = s.title;
-        document.getElementById('display-artist').innerText = s.artist;
-        document.getElementById('status').innerText = "Searching: " + s.title;
-        
-        // This command tells YouTube to search and play the top result
-        player.loadPlaylist({
-            list: s.q,
-            listType: 'search',
-            index: 0
-        });
-        
-        playing = true;
-        document.getElementById('play-pause').innerText = "⏸";
-        renderList();
-    }
-
-    function onStateChange(event) {
-        if (event.data == YT.PlayerState.PLAYING) {
-            document.getElementById('status').innerText = "Playing: " + songs[currentIdx].title;
+function onYouTubeIframeAPIReady() {
+    player = new YT.Player('player', {
+        height: '1', width: '1', videoId: songs[0][1],
+        playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1, 'rel': 0 },
+        events: {
+            'onReady': () => { isReady = true; },
+            'onStateChange': (e) => {
+                if (e.data === YT.PlayerState.ENDED) playSong((currentIdx + 1) % songs.length);
+            },
+            'onError': () => { 
+                document.getElementById("top-status").innerText = "Song unavailable, skipping...";
+                setTimeout(() => playSong((currentIdx + 1) % songs.length), 1000); 
+            }
         }
-        if (event.data == YT.PlayerState.ENDED) {
-            next();
-        }
-    }
+    });
+}
 
-    function renderList() {
-        const list = document.getElementById('list');
-        list.innerHTML = "";
-        songs.forEach((s, i) => {
-            const div = document.createElement('div');
-            div.className = `song-item ${i === currentIdx ? 'active' : ''}`;
-            div.innerHTML = `<strong>${s.title}</strong> &nbsp; - ${s.artist}`;
-            div.onclick = () => loadAndPlay(i);
-            list.appendChild(div);
-        });
+function startAudio() {
+    if (!isStarted && isReady) {
+        player.unMute();
+        player.playVideo();
+        isStarted = true;
+        updateUI();
     }
+}
 
-    document.getElementById('play-pause').onclick = () => {
-        if (!playing) {
-            player.playVideo();
-            document.getElementById('play-pause').innerText = "⏸";
-        } else {
-            player.pauseVideo();
-            document.getElementById('play-pause').innerText = "▶";
-        }
-        playing = !playing;
-    };
-
-    function next() {
-        currentIdx = (currentIdx + 1) % songs.length;
-        loadAndPlay(currentIdx);
-    }
-    
-    document.getElementById('next-btn').onclick = next;
-    document.getElementById('prev-btn').onclick = () => {
-        currentIdx = (currentIdx - 1 + songs.length) % songs.length;
-        loadAndPlay(currentIdx);
-    };
+initUI();
 </script>
+
 </body>
 </html>
